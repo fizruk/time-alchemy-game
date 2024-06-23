@@ -106,6 +106,7 @@ pub struct LevelMap {
     pub size: vec2<i64>,
     pub items: Vec<Item>,
     pub enemies: Vec<Enemy>,
+    pub dead_enemies: Vec<Enemy>,
     pub expansion_cells: Vec<vec2<i64>>,
 }
 
@@ -205,6 +206,7 @@ impl Model {
                     },
                 ],
                 enemies: vec![Enemy::new(vec2(0, 1))],
+                dead_enemies: vec![],
                 expansion_cells: vec![],
             },
             effects: vec![],

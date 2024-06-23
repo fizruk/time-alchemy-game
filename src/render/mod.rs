@@ -93,7 +93,12 @@ impl GameRender {
             }
         }
 
-        for enemy in &model.level_map.enemies {
+        for enemy in model
+            .level_map
+            .enemies
+            .iter()
+            .chain(model.level_map.dead_enemies.iter())
+        {
             let enemy_pos = enemy.pos.map(|x| x as f32);
 
             let animation = match &enemy.state {
@@ -131,14 +136,16 @@ impl GameRender {
                 &target_frame.texture,
                 Rgba::WHITE,
             );
-            self.geng.default_font().draw(
-                framebuffer,
-                &model.camera,
-                &format!("{}", enemy.health),
-                vec2(TextAlign::RIGHT, TextAlign::BOTTOM),
-                mat3::translate(enemy_pos + vec2(0.4, -0.4)) * mat3::scale_uniform(0.4),
-                Rgba::RED,
-            )
+            if enemy.health > 0 {
+                self.geng.default_font().draw(
+                    framebuffer,
+                    &model.camera,
+                    &format!("{}", enemy.health),
+                    vec2(TextAlign::RIGHT, TextAlign::BOTTOM),
+                    mat3::translate(enemy_pos + vec2(0.4, -0.4)) * mat3::scale_uniform(0.4),
+                    Rgba::RED,
+                )
+            }
         }
     }
 }

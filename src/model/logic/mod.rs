@@ -14,6 +14,22 @@ impl Model {
                 }
             }
         }
+
+        for enemy in &mut self.level_map.dead_enemies {
+            enemy.animation_clock += delta_time;
+            if let EnemyState::Action { action, cooldown } = &mut enemy.state {
+                *cooldown -= delta_time;
+            }
+        }
+        self.level_map
+            .dead_enemies
+            .retain(|enemy| match enemy.state {
+                EnemyState::Idle => false,
+                EnemyState::Action {
+                    action: _,
+                    cooldown,
+                } => cooldown > r32(0.0),
+            })
     }
 
     pub fn player_input(&mut self, action: Action) {
@@ -92,7 +108,14 @@ impl Model {
                     for enemy in &mut self.level_map.enemies {
                         enemy.take_damage(damage)
                     }
-                    self.level_map.enemies.retain(|enemy| enemy.health > 0);
+                    let (live, dead) = self
+                        .level_map
+                        .enemies
+                        .drain(..)
+                        .partition(|enemy| enemy.health > 0);
+                    self.level_map.enemies = live;
+                    self.level_map.dead_enemies = dead;
+
                     item.pos = self.player.pos;
                     self.level_map.items.push(item);
                 }
