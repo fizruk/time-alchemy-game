@@ -60,10 +60,19 @@ pub struct LevelMap {
     pub enemies: Vec<Enemy>,
 }
 
+pub enum SoundKind {
+    Steps,
+}
+
+pub enum Effect {
+    PlaySound(SoundKind),
+}
+
 pub struct Model {
     pub camera: Camera2d,
     pub player: Player,
     pub level_map: LevelMap,
+    pub effects: Vec<Effect>,
 }
 
 impl Model {
@@ -100,6 +109,7 @@ impl Model {
                     damage: 0,
                 }],
             },
+            effects: vec![],
         }
     }
 }

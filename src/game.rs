@@ -5,6 +5,7 @@ use geng::prelude::*;
 #[allow(dead_code)]
 pub struct Game {
     geng: Geng,
+    assets: Rc<Assets>,
     render: GameRender,
     model: Model,
 }
@@ -13,6 +14,7 @@ impl Game {
     pub fn new(geng: &Geng, assets: &Rc<Assets>) -> Self {
         Self {
             geng: geng.clone(),
+            assets: assets.clone(),
             render: GameRender::new(geng, assets),
             model: Model::new(),
         }
@@ -35,6 +37,18 @@ impl geng::State for Game {
                 _ => {}
             },
             _ => {}
+        }
+        for effect in std::mem::take(&mut self.model.effects) {
+            match effect {
+                Effect::PlaySound(sound_kind) => match sound_kind {
+                    SoundKind::Steps => {
+                        if let Some(sound) = self.assets.sounds.steps.choose(&mut thread_rng()) {
+                            let mut effect = sound.play();
+                            effect.set_speed(1.5);
+                        }
+                    }
+                },
+            }
         }
     }
 

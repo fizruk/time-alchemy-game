@@ -1,3 +1,5 @@
+use geng::Sound;
+
 use super::*;
 
 impl Model {
@@ -52,5 +54,6 @@ impl Model {
         }
 
         self.player.pos = target_pos;
+        self.effects.push(Effect::PlaySound(SoundKind::Steps))
     }
 }
