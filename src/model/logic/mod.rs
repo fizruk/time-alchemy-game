@@ -3,7 +3,18 @@ use geng::Sound;
 use super::*;
 
 impl Model {
-    pub fn update(&mut self, _delta_time: Time) {}
+    pub fn update(&mut self, delta_time: Time) {
+        for enemy in &mut self.level_map.enemies {
+            enemy.animation_clock += delta_time;
+            if let EnemyState::Action { action, cooldown } = &mut enemy.state {
+                *cooldown -= delta_time;
+                if *cooldown <= r32(0.0) {
+                    enemy.state = EnemyState::Idle;
+                    enemy.animation_clock = r32(0.0);
+                }
+            }
+        }
+    }
 
     pub fn player_input(&mut self, action: Action) {
         match self.state {
@@ -36,6 +47,11 @@ impl Model {
                         pos: cell,
                         health: 3,
                         damage: 0,
+                        state: EnemyState::Action {
+                            action: EnemyAction::Spawn,
+                            cooldown: r32(0.5),
+                        },
+                        animation_clock: r32(0.0),
                     })
                 }
             }

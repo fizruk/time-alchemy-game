@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 geng = "0.17"
+geng-utils = "0.3.0"
 
 [patch.crates-io]
 async-broadcast = { git = "https://github.com/kuviman/async-broadcast", branch = "fix-wasm" } # TODO: until https://github.com/smol-rs/async-broadcast/pull/47 is merged

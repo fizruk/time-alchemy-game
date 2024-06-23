@@ -17,7 +17,6 @@ impl GameRender {
     }
 
     pub fn draw(&mut self, model: &Model, framebuffer: &mut ugli::Framebuffer) {
-        let size2 = model.level_map.size.map(|x| x as f32);
         for pos in model.level_map.cells_iter() {
             let x = pos.x as f32;
             let y = pos.y as f32;
@@ -96,11 +95,33 @@ impl GameRender {
 
         for enemy in &model.level_map.enemies {
             let enemy_pos = enemy.pos.map(|x| x as f32);
+
+            let total_duration = self
+                .assets
+                .sprites
+                .level_1_bot_idle
+                .iter()
+                .map(|frame| frame.duration)
+                .sum();
+
+            let animation_clock_rem = enemy.animation_clock
+                - (enemy.animation_clock / r32(total_duration)).floor() * r32(total_duration);
+
+            let mut t = r32(0.0);
+            let mut target_frame = &self.assets.sprites.level_1_bot_idle[0];
+            for frame in &self.assets.sprites.level_1_bot_idle {
+                if animation_clock_rem >= t && animation_clock_rem < t + r32(frame.duration) {
+                    target_frame = frame;
+                    break;
+                } else {
+                    t += r32(frame.duration);
+                }
+            }
             self.geng.draw2d().textured_quad(
                 framebuffer,
                 &model.camera,
-                Aabb2::point(enemy_pos).extend_symmetric(vec2(0.3, 0.3)),
-                &self.assets.sprites.enemy,
+                Aabb2::point(enemy_pos).extend_symmetric(vec2(0.45, 0.45)),
+                &target_frame.texture,
                 Rgba::WHITE,
             );
             self.geng.default_font().draw(

@@ -1959,6 +1959,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "geng-utils"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "54048cd0fa44312cfe4df52859932ba6c2b17c78ae507419166d970f073a68da"
+dependencies = [
+ "geng",
+ "image",
+ "serde",
+]
+
+[[package]]
 name = "geng-window"
 version = "0.17.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4015,6 +4026,7 @@ name = "time-alchemy"
 version = "0.1.0"
 dependencies = [
  "geng",
+ "geng-utils",
 ]
 
 [[package]]

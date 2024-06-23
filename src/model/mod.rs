@@ -55,6 +55,20 @@ pub struct Enemy {
     pub pos: vec2<i64>,
     pub health: HP,
     pub damage: DP,
+    pub state: EnemyState,
+    pub animation_clock: Time,
+}
+
+pub enum EnemyState {
+    Idle,
+    Action { action: EnemyAction, cooldown: Time },
+}
+
+pub enum EnemyAction {
+    TakeDamage,
+    Attack,
+    Die,
+    Spawn,
 }
 
 pub struct LevelMap {
@@ -163,6 +177,11 @@ impl Model {
                     pos: vec2(0, 1),
                     health: 3,
                     damage: 0,
+                    state: EnemyState::Action {
+                        action: EnemyAction::Spawn,
+                        cooldown: r32(0.5),
+                    },
+                    animation_clock: r32(0.0),
                 }],
                 expansion_cells: vec![],
             },
