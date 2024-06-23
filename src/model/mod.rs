@@ -4,6 +4,13 @@ use geng::prelude::*;
 
 pub type Time = R32;
 
+pub enum Action {
+    MoveUp,
+    MoveDown,
+    MoveLeft,
+    MoveRight,
+}
+
 pub struct Backpack {
     pub ingredients: Vec<Ingredient>,
     pub coins: Coins,

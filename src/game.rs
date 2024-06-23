@@ -25,7 +25,18 @@ impl geng::State for Game {
         self.render.draw(&self.model, framebuffer);
     }
 
-    fn handle_event(&mut self, _event: geng::Event) {}
+    fn handle_event(&mut self, event: geng::Event) {
+        match event {
+            geng::Event::KeyPress { key } => match key {
+                geng::Key::ArrowDown => self.model.player_input(Action::MoveDown),
+                geng::Key::ArrowUp => self.model.player_input(Action::MoveUp),
+                geng::Key::ArrowLeft => self.model.player_input(Action::MoveLeft),
+                geng::Key::ArrowRight => self.model.player_input(Action::MoveRight),
+                _ => {}
+            },
+            _ => {}
+        }
+    }
 
     fn update(&mut self, delta_time: f64) {
         let delta_time = Time::new(delta_time as _);
