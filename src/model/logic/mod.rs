@@ -15,6 +15,10 @@ impl Model {
         };
         let target_pos = self.player.pos + delta;
 
+        if delta.x.abs() + delta.y.abs() != 1 {
+            return;
+        }
+
         let target_on_map = target_pos.x >= 0
             && target_pos.x < self.level_map.size.x
             && target_pos.y >= 0
