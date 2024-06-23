@@ -11,10 +11,46 @@ impl Model {
             Action::MoveRight => vec2(1, 0),
         };
         let target_pos = self.player.pos + delta;
-        if target_pos.x >= 0 && target_pos.x < self.level_map.size.x {
-            if target_pos.y >= 0 && target_pos.y < self.level_map.size.y {
-                self.player.pos = target_pos;
+
+        let target_on_map = target_pos.x >= 0
+            && target_pos.x < self.level_map.size.x
+            && target_pos.y >= 0
+            && target_pos.y < self.level_map.size.y;
+        if !target_on_map {
+            return;
+        }
+
+        let target_on_enemy = self
+            .level_map
+            .enemies
+            .iter()
+            .any(|enemy| enemy.pos == target_pos);
+        if target_on_enemy {
+            return;
+        }
+
+        let (target_items, other_items) = self
+            .level_map
+            .items
+            .drain(..)
+            .partition(|item| item.pos == target_pos);
+        self.level_map.items = other_items;
+        for mut item in target_items {
+            match item.kind {
+                ItemKind::Sword { damage, cost } => {
+                    for enemy in &mut self.level_map.enemies {
+                        enemy.health -= damage;
+                    }
+                    self.level_map.enemies.retain(|enemy| enemy.health > 0);
+                    item.pos = self.player.pos;
+                    self.level_map.items.push(item);
+                }
+                ItemKind::Ingredient(ingredient) => {
+                    self.player.backpack.ingredients.push(ingredient)
+                }
             }
         }
+
+        self.player.pos = target_pos;
     }
 }
