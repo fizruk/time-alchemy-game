@@ -1,6 +1,7 @@
 mod logic;
 
 use geng::prelude::*;
+use itertools::Itertools;
 use log::Level;
 
 pub type Time = R32;
@@ -86,6 +87,20 @@ impl LevelMap {
         (0..self.size.x)
             .flat_map(|x| (0..self.size.y).map(move |y| vec2(x, y)))
             .chain(self.expansion_cells.iter().copied())
+    }
+
+    pub fn adjacent_cells_iter(&self) -> impl Iterator<Item = vec2<i64>> + '_ {
+        (-1..=self.size.x)
+            .flat_map(|x| (-1..=self.size.y).map(move |y| vec2(x, y)))
+            .chain(self.expansion_cells.iter().flat_map(|cell| {
+                (-1..=1).flat_map(move |dx| {
+                    (-1..=1)
+                        .filter(move |dy| manhattan_dist(vec2(0, 0), vec2(dx, *dy)) == 1)
+                        .map(move |dy| *cell + vec2(dx, dy))
+                })
+            }))
+            .unique()
+            .filter(|cell| self.adjacent(*cell))
     }
 }
 

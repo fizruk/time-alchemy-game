@@ -34,6 +34,24 @@ impl GameRender {
             );
         }
 
+        if let State::ExpandMap = model.state {
+            for pos in model.level_map.adjacent_cells_iter() {
+                let x = pos.x as f32;
+                let y = pos.y as f32;
+                self.geng.draw2d().quad(
+                    framebuffer,
+                    &model.camera,
+                    Aabb2::point(vec2(x, y)).extend_symmetric(vec2(0.45, 0.45)),
+                    Rgba {
+                        r: 0.9,
+                        g: 0.9,
+                        b: 0.9,
+                        a: 0.5,
+                    },
+                );
+            }
+        }
+
         let player_pos = model.player.pos.map(|x| x as f32);
         self.geng.draw2d().textured_quad(
             framebuffer,
