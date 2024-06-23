@@ -32,50 +32,56 @@ impl GameRender {
                     framebuffer,
                     &model.camera,
                     Aabb2::point(vec2(x, y)).extend_symmetric(vec2(0.45, 0.45)),
-                    Rgba::BLACK,
+                    Rgba {
+                        r: 0.9,
+                        g: 0.9,
+                        b: 0.9,
+                        a: 1.0,
+                    },
                 );
             }
         }
 
         let player_pos = model.player.pos.map(|x| x as f32);
-        self.geng
-            .draw2d()
-            .circle(framebuffer, &model.camera, player_pos, 0.3, Rgba::WHITE);
+        self.geng.draw2d().textured_quad(
+            framebuffer,
+            &model.camera,
+            Aabb2::point(player_pos).extend_symmetric(vec2(0.4, 0.4)),
+            &self.assets.sprites.player,
+            Rgba::WHITE,
+        );
 
         for item in &model.level_map.items {
             let item_pos = item.pos.map(|x| x as f32);
             match &item.kind {
                 ItemKind::Ingredient(ingredient) => match ingredient {
-                    Ingredient::Leaf => {
-                        self.geng.draw2d().circle(
-                            framebuffer,
-                            &model.camera,
-                            item_pos,
-                            0.15,
-                            Rgba::GREEN,
-                        );
-                    }
-                    _ => {}
-                },
-                ItemKind::Sword { damage, cost } => {
-                    self.geng.draw2d().circle(
+                    Ingredient::Leaf => self.geng.draw2d().textured_quad(
                         framebuffer,
                         &model.camera,
-                        item_pos,
-                        0.2,
-                        Rgba::GRAY,
-                    );
-                }
+                        Aabb2::point(item_pos).extend_symmetric(vec2(0.3, 0.3)),
+                        &self.assets.sprites.leaf,
+                        Rgba::WHITE,
+                    ),
+                    _ => {}
+                },
+                ItemKind::Sword { damage, cost } => self.geng.draw2d().textured_quad(
+                    framebuffer,
+                    &model.camera,
+                    Aabb2::point(item_pos).extend_symmetric(vec2(0.3, 0.3)),
+                    &self.assets.sprites.sword,
+                    Rgba::WHITE,
+                ),
             }
         }
 
         for enemy in &model.level_map.enemies {
             let enemy_pos = enemy.pos.map(|x| x as f32);
-            self.geng.draw2d().quad(
+            self.geng.draw2d().textured_quad(
                 framebuffer,
                 &model.camera,
                 Aabb2::point(enemy_pos).extend_symmetric(vec2(0.3, 0.3)),
-                Rgba::GRAY,
+                &self.assets.sprites.enemy,
+                Rgba::WHITE,
             );
         }
     }
