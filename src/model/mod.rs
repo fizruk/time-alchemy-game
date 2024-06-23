@@ -137,7 +137,7 @@ impl Model {
                 items: vec![
                     Item {
                         pos: vec2(2, 0),
-                        kind: ItemKind::Sword { damage: 3 },
+                        kind: ItemKind::Sword { damage: 2 },
                     },
                     Item {
                         pos: vec2(1, 2),

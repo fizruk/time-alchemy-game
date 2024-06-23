@@ -1,6 +1,6 @@
 use crate::{assets::Assets, model::*};
 
-use geng::prelude::*;
+use geng::{prelude::*, TextAlign};
 
 #[allow(dead_code)]
 pub struct GameRender {
@@ -56,13 +56,23 @@ impl GameRender {
                     ),
                     _ => {}
                 },
-                ItemKind::Sword { damage } => self.geng.draw2d().textured_quad(
-                    framebuffer,
-                    &model.camera,
-                    Aabb2::point(item_pos).extend_symmetric(vec2(0.3, 0.3)),
-                    &self.assets.sprites.sword,
-                    Rgba::WHITE,
-                ),
+                ItemKind::Sword { damage } => {
+                    self.geng.draw2d().textured_quad(
+                        framebuffer,
+                        &model.camera,
+                        Aabb2::point(item_pos).extend_symmetric(vec2(0.3, 0.3)),
+                        &self.assets.sprites.sword,
+                        Rgba::WHITE,
+                    );
+                    self.geng.default_font().draw(
+                        framebuffer,
+                        &model.camera,
+                        &format!("{}", damage),
+                        vec2(TextAlign::RIGHT, TextAlign::BOTTOM),
+                        mat3::translate(item_pos + vec2(0.4, -0.4)) * mat3::scale_uniform(0.4),
+                        Rgba::BLACK,
+                    )
+                }
             }
         }
 
@@ -75,6 +85,14 @@ impl GameRender {
                 &self.assets.sprites.enemy,
                 Rgba::WHITE,
             );
+            self.geng.default_font().draw(
+                framebuffer,
+                &model.camera,
+                &format!("{}", enemy.health),
+                vec2(TextAlign::RIGHT, TextAlign::BOTTOM),
+                mat3::translate(enemy_pos + vec2(0.4, -0.4)) * mat3::scale_uniform(0.4),
+                Rgba::RED,
+            )
         }
     }
 }
