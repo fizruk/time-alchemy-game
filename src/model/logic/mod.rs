@@ -43,16 +43,7 @@ impl Model {
                     })
                     .choose(&mut thread_rng())
                 {
-                    self.level_map.enemies.push(Enemy {
-                        pos: cell,
-                        health: 3,
-                        damage: 0,
-                        state: EnemyState::Action {
-                            action: EnemyAction::Spawn,
-                            cooldown: r32(0.5),
-                        },
-                        animation_clock: r32(0.0),
-                    })
+                    self.level_map.enemies.push(Enemy::new(cell))
                 }
             }
             Action::MoveUp => {}
@@ -99,7 +90,7 @@ impl Model {
             match item.kind {
                 ItemKind::Sword { damage } => {
                     for enemy in &mut self.level_map.enemies {
-                        enemy.health -= damage;
+                        enemy.take_damage(damage)
                     }
                     self.level_map.enemies.retain(|enemy| enemy.health > 0);
                     item.pos = self.player.pos;

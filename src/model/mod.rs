@@ -59,6 +59,37 @@ pub struct Enemy {
     pub animation_clock: Time,
 }
 
+impl Enemy {
+    pub fn new(pos: vec2<i64>) -> Self {
+        Self {
+            pos,
+            health: 3,
+            damage: 0,
+            state: EnemyState::Action {
+                action: EnemyAction::Spawn,
+                cooldown: r32(0.5),
+            },
+            animation_clock: r32(0.0),
+        }
+    }
+
+    pub fn take_damage(&mut self, damage: DP) {
+        self.health -= damage;
+        if self.health > 0 {
+            self.state = EnemyState::Action {
+                action: EnemyAction::TakeDamage,
+                cooldown: r32(0.5), // TODO: use duration of the animation
+            };
+        } else {
+            self.state = EnemyState::Action {
+                action: EnemyAction::Die,
+                cooldown: r32(0.5), // TODO: use duration of the animation
+            };
+        }
+        self.animation_clock = r32(0.0);
+    }
+}
+
 pub enum EnemyState {
     Idle,
     Action { action: EnemyAction, cooldown: Time },
@@ -173,16 +204,7 @@ impl Model {
                         kind: ItemKind::Ingredient(Ingredient::Leaf),
                     },
                 ],
-                enemies: vec![Enemy {
-                    pos: vec2(0, 1),
-                    health: 3,
-                    damage: 0,
-                    state: EnemyState::Action {
-                        action: EnemyAction::Spawn,
-                        cooldown: r32(0.5),
-                    },
-                    animation_clock: r32(0.0),
-                }],
+                enemies: vec![Enemy::new(vec2(0, 1))],
                 expansion_cells: vec![],
             },
             effects: vec![],

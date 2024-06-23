@@ -96,20 +96,27 @@ impl GameRender {
         for enemy in &model.level_map.enemies {
             let enemy_pos = enemy.pos.map(|x| x as f32);
 
-            let total_duration = self
-                .assets
-                .sprites
-                .level_1_bot_idle
-                .iter()
-                .map(|frame| frame.duration)
-                .sum();
+            let animation = match &enemy.state {
+                EnemyState::Idle => &self.assets.sprites.level_1_bot_idle,
+                EnemyState::Action {
+                    action,
+                    cooldown: _,
+                } => match action {
+                    EnemyAction::TakeDamage => &self.assets.sprites.level_1_bot_idle,
+                    EnemyAction::Attack => &self.assets.sprites.level_1_bot_idle,
+                    EnemyAction::Die => &self.assets.sprites.level_1_bot_idle,
+                    EnemyAction::Spawn => &self.assets.sprites.level_1_bot_idle,
+                },
+            };
+
+            let total_duration = animation.iter().map(|frame| frame.duration).sum();
 
             let animation_clock_rem = enemy.animation_clock
                 - (enemy.animation_clock / r32(total_duration)).floor() * r32(total_duration);
 
             let mut t = r32(0.0);
-            let mut target_frame = &self.assets.sprites.level_1_bot_idle[0];
-            for frame in &self.assets.sprites.level_1_bot_idle {
+            let mut target_frame = &animation[0];
+            for frame in animation {
                 if animation_clock_rem >= t && animation_clock_rem < t + r32(frame.duration) {
                     target_frame = frame;
                     break;
