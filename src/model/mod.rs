@@ -32,7 +32,7 @@ pub enum Ingredient {
 }
 
 pub enum ItemKind {
-    Sword{damage: DP, cost: Coins},
+    Sword { damage: DP, cost: Coins },
     Ingredient(Ingredient),
 }
 
@@ -62,32 +62,40 @@ pub struct Model {
 impl Model {
     pub fn new() -> Self {
         Self {
-            camera: Camera2d { center: vec2(0.0, 0.0), rotation: Angle::ZERO, fov: 10.0 },
+            camera: Camera2d {
+                center: vec2(0.0, 0.0),
+                rotation: Angle::ZERO,
+                fov: 10.0,
+            },
             player: Player {
                 pos: vec2(2, 1),
                 health: 100,
-                backpack: Backpack { ingredients: vec![], coins: 10 }
+                backpack: Backpack {
+                    ingredients: vec![],
+                    coins: 10,
+                },
             },
             level_map: LevelMap {
                 size: vec2(3, 3),
                 items: vec![
                     Item {
                         pos: vec2(2, 0),
-                        kind: ItemKind::Sword { damage: 3, cost: 10 },
+                        kind: ItemKind::Sword {
+                            damage: 3,
+                            cost: 10,
+                        },
                     },
-                    Item{
+                    Item {
                         pos: vec2(1, 2),
                         kind: ItemKind::Ingredient(Ingredient::Leaf),
-                    }
+                    },
                 ],
-                enemies: vec![
-                    Enemy{
-                        pos: vec2(0, 1),
-                        health: 3,
-                        damage: 0,
-                    }
-                ]
-            }
+                enemies: vec![Enemy {
+                    pos: vec2(0, 1),
+                    health: 3,
+                    damage: 0,
+                }],
+            },
         }
     }
 }
