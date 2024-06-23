@@ -8,6 +8,7 @@ pub struct Game {
     assets: Rc<Assets>,
     render: GameRender,
     model: Model,
+    framebuffer_size: vec2<usize>,
 }
 
 impl Game {
@@ -17,6 +18,7 @@ impl Game {
             assets: assets.clone(),
             render: GameRender::new(geng, assets),
             model: Model::new(),
+            framebuffer_size: vec2(1, 1), // dummy
         }
     }
 }
@@ -25,6 +27,7 @@ impl geng::State for Game {
     fn draw(&mut self, framebuffer: &mut ugli::Framebuffer) {
         ugli::clear(framebuffer, Some(Rgba::BLACK), None, None);
         self.render.draw(&self.model, framebuffer);
+        self.framebuffer_size = framebuffer.size();
     }
 
     fn handle_event(&mut self, event: geng::Event) {
@@ -36,6 +39,17 @@ impl geng::State for Game {
                 geng::Key::ArrowRight => self.model.player_input(Action::MoveRight),
                 _ => {}
             },
+            geng::Event::TouchEnd(touch) => {
+                let pos = self
+                    .model
+                    .camera
+                    .screen_to_world(
+                        self.framebuffer_size.map(|x| x as f32),
+                        touch.position.map(|x| x as f32),
+                    )
+                    .map(|x| (x + 0.5).floor() as i64);
+                self.model.player_input(Action::MoveTo(pos));
+            }
             _ => {}
         }
         for effect in std::mem::take(&mut self.model.effects) {

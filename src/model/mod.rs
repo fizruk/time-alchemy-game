@@ -9,6 +9,7 @@ pub enum Action {
     MoveDown,
     MoveLeft,
     MoveRight,
+    MoveTo(vec2<i64>),
 }
 
 pub struct Backpack {

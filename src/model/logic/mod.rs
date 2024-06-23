@@ -11,6 +11,7 @@ impl Model {
             Action::MoveUp => vec2(0, 1),
             Action::MoveLeft => vec2(-1, 0),
             Action::MoveRight => vec2(1, 0),
+            Action::MoveTo(pos) => pos - self.player.pos,
         };
         let target_pos = self.player.pos + delta;
 
