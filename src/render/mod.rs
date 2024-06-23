@@ -64,7 +64,7 @@ impl GameRender {
                     ),
                     _ => {}
                 },
-                ItemKind::Sword { damage, cost } => self.geng.draw2d().textured_quad(
+                ItemKind::Sword { damage } => self.geng.draw2d().textured_quad(
                     framebuffer,
                     &model.camera,
                     Aabb2::point(item_pos).extend_symmetric(vec2(0.3, 0.3)),

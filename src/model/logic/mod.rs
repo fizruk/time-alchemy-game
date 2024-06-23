@@ -37,7 +37,7 @@ impl Model {
         self.level_map.items = other_items;
         for mut item in target_items {
             match item.kind {
-                ItemKind::Sword { damage, cost } => {
+                ItemKind::Sword { damage } => {
                     for enemy in &mut self.level_map.enemies {
                         enemy.health -= damage;
                     }

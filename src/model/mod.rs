@@ -39,7 +39,7 @@ pub enum Ingredient {
 }
 
 pub enum ItemKind {
-    Sword { damage: DP, cost: Coins },
+    Sword { damage: DP },
     Ingredient(Ingredient),
 }
 
@@ -87,10 +87,7 @@ impl Model {
                 items: vec![
                     Item {
                         pos: vec2(2, 0),
-                        kind: ItemKind::Sword {
-                            damage: 3,
-                            cost: 10,
-                        },
+                        kind: ItemKind::Sword { damage: 3 },
                     },
                     Item {
                         pos: vec2(1, 2),
