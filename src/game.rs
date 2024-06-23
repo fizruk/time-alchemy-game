@@ -9,6 +9,7 @@ pub struct Game {
     render: GameRender,
     model: Model,
     framebuffer_size: vec2<usize>,
+    cursor_pos: vec2<f64>,
 }
 
 impl Game {
@@ -19,6 +20,7 @@ impl Game {
             render: GameRender::new(geng, assets),
             model: Model::new(),
             framebuffer_size: vec2(1, 1), // dummy
+            cursor_pos: vec2(0.0, 0.0),   // dummy
         }
     }
 }
@@ -39,6 +41,21 @@ impl geng::State for Game {
                 geng::Key::ArrowRight => self.model.player_input(Action::MoveRight),
                 _ => {}
             },
+            geng::Event::MouseRelease { button } => match button {
+                geng::MouseButton::Left => {
+                    let pos = self
+                        .model
+                        .camera
+                        .screen_to_world(
+                            self.framebuffer_size.map(|x| x as f32),
+                            self.cursor_pos.map(|x| x as f32),
+                        )
+                        .map(|x| (x + 0.5).floor() as i64);
+                    self.model.player_input(Action::MoveTo(pos));
+                }
+                geng::MouseButton::Middle => {}
+                geng::MouseButton::Right => {}
+            },
             geng::Event::TouchEnd(touch) => {
                 let pos = self
                     .model
@@ -49,6 +66,9 @@ impl geng::State for Game {
                     )
                     .map(|x| (x + 0.5).floor() as i64);
                 self.model.player_input(Action::MoveTo(pos));
+            }
+            geng::Event::CursorMove { position } => {
+                self.cursor_pos = position;
             }
             _ => {}
         }

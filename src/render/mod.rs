@@ -18,28 +18,20 @@ impl GameRender {
 
     pub fn draw(&mut self, model: &Model, framebuffer: &mut ugli::Framebuffer) {
         let size2 = model.level_map.size.map(|x| x as f32);
-        self.geng.draw2d().quad(
-            framebuffer,
-            &model.camera,
-            Aabb2::point(vec2(-0.5, -0.5)).extend_positive(size2),
-            Rgba::BLUE,
-        );
-        for i in 0..model.level_map.size.x {
-            for j in 0..model.level_map.size.y {
-                let x = i as f32;
-                let y = j as f32;
-                self.geng.draw2d().quad(
-                    framebuffer,
-                    &model.camera,
-                    Aabb2::point(vec2(x, y)).extend_symmetric(vec2(0.45, 0.45)),
-                    Rgba {
-                        r: 0.9,
-                        g: 0.9,
-                        b: 0.9,
-                        a: 1.0,
-                    },
-                );
-            }
+        for pos in model.level_map.cells_iter() {
+            let x = pos.x as f32;
+            let y = pos.y as f32;
+            self.geng.draw2d().quad(
+                framebuffer,
+                &model.camera,
+                Aabb2::point(vec2(x, y)).extend_symmetric(vec2(0.45, 0.45)),
+                Rgba {
+                    r: 0.9,
+                    g: 0.9,
+                    b: 0.9,
+                    a: 1.0,
+                },
+            );
         }
 
         let player_pos = model.player.pos.map(|x| x as f32);

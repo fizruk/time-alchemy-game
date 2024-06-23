@@ -6,6 +6,47 @@ impl Model {
     pub fn update(&mut self, _delta_time: Time) {}
 
     pub fn player_input(&mut self, action: Action) {
+        match self.state {
+            State::Day => self.player_input_day(action),
+            State::ExpandMap => self.player_input_expand_map(action),
+            State::Shop => todo!(),
+            State::Night => todo!(),
+        }
+    }
+
+    pub fn player_input_expand_map(&mut self, action: Action) {
+        match action {
+            Action::MoveTo(pos) => {
+                if !self.level_map.adjacent(pos) {
+                    return;
+                }
+                self.level_map.expansion_cells.push(pos);
+                self.state = State::Day;
+
+                if let Some(cell) = self
+                    .level_map
+                    .cells_iter()
+                    .filter(|cell| {
+                        !(*cell == self.player.pos
+                            || self.level_map.items.iter().any(|item| *cell == item.pos))
+                    })
+                    .choose(&mut thread_rng())
+                {
+                    self.level_map.enemies.push(Enemy {
+                        pos: cell,
+                        health: 3,
+                        damage: 0,
+                    })
+                }
+            }
+            Action::MoveUp => {}
+            Action::MoveDown => {}
+            Action::MoveLeft => {}
+            Action::MoveRight => {}
+        }
+    }
+
+    pub fn player_input_day(&mut self, action: Action) {
         let delta = match action {
             Action::MoveDown => vec2(0, -1),
             Action::MoveUp => vec2(0, 1),
@@ -19,11 +60,7 @@ impl Model {
             return;
         }
 
-        let target_on_map = target_pos.x >= 0
-            && target_pos.x < self.level_map.size.x
-            && target_pos.y >= 0
-            && target_pos.y < self.level_map.size.y;
-        if !target_on_map {
+        if !self.level_map.inside(target_pos) {
             return;
         }
 
@@ -59,6 +96,12 @@ impl Model {
         }
 
         self.player.pos = target_pos;
-        self.effects.push(Effect::PlaySound(SoundKind::Steps))
+        self.camera.center = self.player.pos.map(|x| x as f32);
+
+        self.effects.push(Effect::PlaySound(SoundKind::Steps));
+
+        if self.level_map.enemies.is_empty() {
+            self.state = State::ExpandMap;
+        }
     }
 }
