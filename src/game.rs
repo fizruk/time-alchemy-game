@@ -74,14 +74,18 @@ impl geng::State for Game {
         }
         for effect in std::mem::take(&mut self.model.effects) {
             match effect {
-                Effect::PlaySound(sound_kind) => match sound_kind {
-                    SoundKind::Steps => {
-                        if let Some(sound) = self.assets.sounds.steps.choose(&mut thread_rng()) {
-                            let mut effect = sound.play();
-                            effect.set_speed(1.5);
-                        }
+                Effect::PlaySound(sound_kind) => {
+                    let sound_variants = match sound_kind {
+                        SoundKind::TwoSteps => &self.assets.sounds.two_steps,
+                        SoundKind::MetalHit => &self.assets.sounds.metal_hit,
+                        SoundKind::PourWater => &self.assets.sounds.pour_water,
+                        SoundKind::RobotMove => &self.assets.sounds.robot_move,
+                    };
+                    if let Some(sound) = sound_variants.choose(&mut thread_rng()) {
+                        let mut effect = sound.play();
+                        effect.set_speed(1.5);
                     }
-                },
+                }
             }
         }
     }

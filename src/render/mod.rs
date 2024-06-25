@@ -25,9 +25,9 @@ impl GameRender {
                 &model.camera,
                 Aabb2::point(vec2(x, y)).extend_symmetric(vec2(0.45, 0.45)),
                 Rgba {
-                    r: 0.9,
-                    g: 0.9,
-                    b: 0.9,
+                    r: 0.2,
+                    g: 0.2,
+                    b: 0.2,
                     a: 1.0,
                 },
             );
@@ -42,9 +42,9 @@ impl GameRender {
                     &model.camera,
                     Aabb2::point(vec2(x, y)).extend_symmetric(vec2(0.45, 0.45)),
                     Rgba {
-                        r: 0.9,
-                        g: 0.9,
-                        b: 0.9,
+                        r: 0.3,
+                        g: 0.3,
+                        b: 0.1,
                         a: 0.5,
                     },
                 );
@@ -102,15 +102,18 @@ impl GameRender {
             let enemy_pos = enemy.pos.map(|x| x as f32);
 
             let animation = match &enemy.state {
-                EnemyState::Idle => &self.assets.sprites.level_1_bot_idle,
+                EnemyState::Idle => match enemy.mode {
+                    EnemyMode::Normal => &self.assets.sprites.level_1_bot_idle_normal,
+                    EnemyMode::Damaged => &self.assets.sprites.level_1_bot_idle_damaged,
+                },
                 EnemyState::Action {
                     action,
                     cooldown: _,
                 } => match action {
-                    EnemyAction::TakeDamage => &self.assets.sprites.level_1_bot_idle,
-                    EnemyAction::Attack => &self.assets.sprites.level_1_bot_idle,
-                    EnemyAction::Die => &self.assets.sprites.level_1_bot_idle,
-                    EnemyAction::Spawn => &self.assets.sprites.level_1_bot_idle,
+                    EnemyAction::TakeDamage => &self.assets.sprites.level_1_bot_idle_damaged,
+                    EnemyAction::Attack => &self.assets.sprites.level_1_bot_idle_normal,
+                    EnemyAction::Die => &self.assets.sprites.level_1_bot_die,
+                    EnemyAction::Spawn => &self.assets.sprites.level_1_bot_idle_normal,
                 },
             };
 

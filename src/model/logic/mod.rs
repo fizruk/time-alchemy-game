@@ -59,7 +59,8 @@ impl Model {
                     })
                     .choose(&mut thread_rng())
                 {
-                    self.level_map.enemies.push(Enemy::new(cell))
+                    self.level_map.enemies.push(Enemy::new(cell));
+                    self.effects.push(Effect::PlaySound(SoundKind::RobotMove));
                 }
             }
             Action::MoveUp => {}
@@ -102,11 +103,13 @@ impl Model {
             .drain(..)
             .partition(|item| item.pos == target_pos);
         self.level_map.items = other_items;
+        let mut did_hit_enemy = false;
         for mut item in target_items {
             match item.kind {
                 ItemKind::Sword { damage } => {
                     for enemy in &mut self.level_map.enemies {
-                        enemy.take_damage(damage)
+                        enemy.take_damage(damage);
+                        did_hit_enemy = true;
                     }
                     let (live, dead) = self
                         .level_map
@@ -128,7 +131,10 @@ impl Model {
         self.player.pos = target_pos;
         self.camera.center = self.player.pos.map(|x| x as f32);
 
-        self.effects.push(Effect::PlaySound(SoundKind::Steps));
+        self.effects.push(Effect::PlaySound(SoundKind::TwoSteps));
+        if did_hit_enemy {
+            self.effects.push(Effect::PlaySound(SoundKind::MetalHit));
+        }
 
         if self.level_map.enemies.is_empty() {
             self.state = State::ExpandMap;

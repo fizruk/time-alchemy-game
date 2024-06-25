@@ -56,6 +56,7 @@ pub struct Enemy {
     pub health: HP,
     pub damage: DP,
     pub state: EnemyState,
+    pub mode: EnemyMode,
     pub animation_clock: Time,
 }
 
@@ -69,6 +70,7 @@ impl Enemy {
                 action: EnemyAction::Spawn,
                 cooldown: r32(0.5),
             },
+            mode: EnemyMode::Normal,
             animation_clock: r32(0.0),
         }
     }
@@ -87,12 +89,18 @@ impl Enemy {
             };
         }
         self.animation_clock = r32(0.0);
+        self.mode = EnemyMode::Damaged;
     }
 }
 
 pub enum EnemyState {
     Idle,
     Action { action: EnemyAction, cooldown: Time },
+}
+
+pub enum EnemyMode {
+    Normal,
+    Damaged,
 }
 
 pub enum EnemyAction {
@@ -155,7 +163,10 @@ pub fn manhattan_dist(pos1: vec2<i64>, pos2: vec2<i64>) -> i64 {
 }
 
 pub enum SoundKind {
-    Steps,
+    TwoSteps,
+    MetalHit,
+    PourWater,
+    RobotMove,
 }
 
 pub enum Effect {

@@ -13,14 +13,24 @@ pub struct Sprites {
     pub enemy: ugli::Texture,
     pub sword: ugli::Texture,
     pub leaf: ugli::Texture,
-    #[load(load_with = "load_gif(&manager, &base_path.join(\"level_1_bot_idle.gif\"))")]
-    pub level_1_bot_idle: Vec<GifFrame>,
+    #[load(load_with = "load_gif(&manager, &base_path.join(\"level_1_bot_idle_normal.gif\"))")]
+    pub level_1_bot_idle_normal: Vec<GifFrame>,
+    #[load(load_with = "load_gif(&manager, &base_path.join(\"level_1_bot_idle_damaged.gif\"))")]
+    pub level_1_bot_idle_damaged: Vec<GifFrame>,
+    #[load(load_with = "load_gif(&manager, &base_path.join(\"level_1_bot_die.gif\"))")]
+    pub level_1_bot_die: Vec<GifFrame>,
 }
 
 #[derive(geng::asset::Load)]
 pub struct Sounds {
     #[load(list = "1..=6", path = "two-steps/two-steps-*.wav")]
-    pub steps: Vec<geng::Sound>,
+    pub two_steps: Vec<geng::Sound>,
+    #[load(list = "1..=2", path = "pour-water/pour-water-*.wav")]
+    pub pour_water: Vec<geng::Sound>,
+    #[load(list = "1..=3", path = "metal-hit/metal-hit-*.wav")]
+    pub metal_hit: Vec<geng::Sound>,
+    #[load(list = "1..=2", path = "robot-move/robot-move-*.wav")]
+    pub robot_move: Vec<geng::Sound>,
 }
 
 impl Assets {
