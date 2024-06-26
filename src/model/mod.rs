@@ -66,10 +66,7 @@ impl Enemy {
             pos,
             health: 3,
             damage: 0,
-            state: EnemyState::Action {
-                action: EnemyAction::Spawn,
-                cooldown: r32(0.5),
-            },
+            state: EnemyState::Action(Cooldown::new(EnemyAction::Spawn, r32(0.5))),
             mode: EnemyMode::Normal,
             animation_clock: r32(0.0),
         }
@@ -78,15 +75,9 @@ impl Enemy {
     pub fn take_damage(&mut self, damage: DP) {
         self.health -= damage;
         if self.health > 0 {
-            self.state = EnemyState::Action {
-                action: EnemyAction::TakeDamage,
-                cooldown: r32(0.5), // TODO: use duration of the animation
-            };
+            self.state = EnemyState::Action(Cooldown::new(EnemyAction::TakeDamage, r32(0.5)));
         } else {
-            self.state = EnemyState::Action {
-                action: EnemyAction::Die,
-                cooldown: r32(0.5), // TODO: use duration of the animation
-            };
+            self.state = EnemyState::Action(Cooldown::new(EnemyAction::Die, r32(0.5)));
         }
         self.animation_clock = r32(0.0);
         self.mode = EnemyMode::Damaged;
@@ -95,7 +86,23 @@ impl Enemy {
 
 pub enum EnemyState {
     Idle,
-    Action { action: EnemyAction, cooldown: Time },
+    Action(Cooldown<EnemyAction>),
+}
+
+pub struct Cooldown<T> {
+    pub action: T,
+    pub leftover: Time,
+    pub total: Time,
+}
+
+impl<T> Cooldown<T> {
+    pub fn new(action: T, total: Time) -> Self {
+        Self {
+            action,
+            total,
+            leftover: total,
+        }
+    }
 }
 
 pub enum EnemyMode {

@@ -106,10 +106,7 @@ impl GameRender {
                     EnemyMode::Normal => &self.assets.sprites.level_1_bot_idle_normal,
                     EnemyMode::Damaged => &self.assets.sprites.level_1_bot_idle_damaged,
                 },
-                EnemyState::Action {
-                    action,
-                    cooldown: _,
-                } => match action {
+                EnemyState::Action(Cooldown { action, .. }) => match action {
                     EnemyAction::TakeDamage => &self.assets.sprites.level_1_bot_idle_damaged,
                     EnemyAction::Attack => &self.assets.sprites.level_1_bot_idle_normal,
                     EnemyAction::Die => &self.assets.sprites.level_1_bot_die,
@@ -118,9 +115,15 @@ impl GameRender {
             };
 
             let total_duration = animation.iter().map(|frame| frame.duration).sum();
+            let clock = match enemy.state {
+                EnemyState::Action(Cooldown {
+                    leftover, total, ..
+                }) => r32(total_duration) * (r32(1.0) - leftover / total),
+                EnemyState::Idle => enemy.animation_clock,
+            };
 
-            let animation_clock_rem = enemy.animation_clock
-                - (enemy.animation_clock / r32(total_duration)).floor() * r32(total_duration);
+            let animation_clock_rem =
+                clock - (clock / r32(total_duration)).floor() * r32(total_duration);
 
             let mut t = r32(0.0);
             let mut target_frame = &animation[0];

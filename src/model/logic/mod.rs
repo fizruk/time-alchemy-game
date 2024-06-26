@@ -6,9 +6,12 @@ impl Model {
     pub fn update(&mut self, delta_time: Time) {
         for enemy in &mut self.level_map.enemies {
             enemy.animation_clock += delta_time;
-            if let EnemyState::Action { action, cooldown } = &mut enemy.state {
-                *cooldown -= delta_time;
-                if *cooldown <= r32(0.0) {
+            if let EnemyState::Action(Cooldown {
+                action, leftover, ..
+            }) = &mut enemy.state
+            {
+                *leftover -= delta_time;
+                if *leftover <= r32(0.0) {
                     enemy.state = EnemyState::Idle;
                     enemy.animation_clock = r32(0.0);
                 }
@@ -17,18 +20,18 @@ impl Model {
 
         for enemy in &mut self.level_map.dead_enemies {
             enemy.animation_clock += delta_time;
-            if let EnemyState::Action { action, cooldown } = &mut enemy.state {
-                *cooldown -= delta_time;
+            if let EnemyState::Action(Cooldown {
+                action, leftover, ..
+            }) = &mut enemy.state
+            {
+                *leftover -= delta_time;
             }
         }
         self.level_map
             .dead_enemies
             .retain(|enemy| match enemy.state {
                 EnemyState::Idle => false,
-                EnemyState::Action {
-                    action: _,
-                    cooldown,
-                } => cooldown > r32(0.0),
+                EnemyState::Action(Cooldown { leftover, .. }) => leftover > r32(0.0),
             })
     }
 
