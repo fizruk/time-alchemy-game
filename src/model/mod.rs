@@ -23,6 +23,7 @@ pub struct Player {
     pub pos: vec2<i64>,
     pub health: HP,
     pub backpack: Backpack,
+    pub turns_remaining: usize,
 }
 
 type HP = i64;
@@ -210,6 +211,7 @@ impl Model {
                     ingredients: vec![],
                     coins: 10,
                 },
+                turns_remaining: 3,
             },
             level_map: LevelMap {
                 size: vec2(3, 3),

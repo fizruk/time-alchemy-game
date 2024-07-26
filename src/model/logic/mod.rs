@@ -40,7 +40,7 @@ impl Model {
             State::Day => self.player_input_day(action),
             State::ExpandMap => self.player_input_expand_map(action),
             State::Shop => todo!(),
-            State::Night => todo!(),
+            State::Night => self.player_input_night(action),
         }
     }
 
@@ -51,7 +51,7 @@ impl Model {
                     return;
                 }
                 self.level_map.expansion_cells.push(pos);
-                self.state = State::Day;
+                self.phase_day();
 
                 if let Some(cell) = self
                     .level_map
@@ -142,5 +142,52 @@ impl Model {
         if self.level_map.enemies.is_empty() {
             self.state = State::ExpandMap;
         }
+
+        self.player.turns_remaining = self.player.turns_remaining.saturating_sub(1);
+        if self.player.turns_remaining == 0 {
+            self.phase_night();
+        }
+    }
+
+    fn player_input_night(&mut self, _action: Action) {}
+
+    fn phase_day(&mut self) {
+        self.state = State::Day;
+        self.player.turns_remaining = 3;
+    }
+
+    fn phase_night(&mut self) {
+        let mut rng = thread_rng();
+        self.state = State::Night;
+
+        let ids: Vec<_> = (0..self.level_map.enemies.len()).collect();
+        for id in ids {
+            let Some(enemy) = self.level_map.enemies.get(id) else {
+                continue;
+            };
+
+            let Some(target_position) = [vec2(-1, 0), vec2(0, -1), vec2(1, 0), vec2(0, 1)]
+                .into_iter()
+                .map(|delta| enemy.pos + delta)
+                .filter(|&pos| {
+                    self.level_map.inside(pos)
+                        && self.player.pos != pos
+                        && !self.level_map.enemies.iter().any(|other| other.pos == pos)
+                        && !self.level_map.items.iter().any(|item| item.pos == pos)
+                })
+                .choose(&mut rng)
+            else {
+                continue;
+            };
+
+            let enemy = self
+                .level_map
+                .enemies
+                .get_mut(id)
+                .expect("enemy was confirmed to exist at the start of the loop");
+            enemy.pos = target_position;
+        }
+
+        self.phase_day();
     }
 }
